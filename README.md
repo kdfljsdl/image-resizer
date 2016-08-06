@@ -35,11 +35,12 @@ Configuration is very simple. Configuration file is ./conf/bot.properties.
  - enter app configuration page and generate access toke. Set access toke value to cloudstorage.dropBox.AccessToken property in the file bot.properties.
  - set "Allow implicit grant" to Allow
 
+
 3. Run the bot.
  Bot works according to specification defined in uploader_bot_java.compressed.pdf file.
  Put files to some foled which is accessing to the bot.
  Run:
- ./bot schedule FOLDER_NAME, where FOLED_NAME-the folder with images
+ ./bot schedule FOLDER_NAME, where FOLDED_NAME-the folder with images
  ./bot resize
  ./bot upload
 
