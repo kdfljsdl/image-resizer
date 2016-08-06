@@ -1,0 +1,75 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- Включаем опцию использования конфигурационных аннотаций (@Annotation-based configuration)-->
+    <context:annotation-config/>
+
+    <context:component-scan base-package="my.dertraktor"/>
+
+    <context:property-placeholder
+            location="bot.properties, file:../conf/bot.properties"
+            ignore-resource-not-found="true"
+            ignore-unresolvable="false"/>
+
+    <bean id="connectionFactory" class="org.springframework.amqp.rabbit.connection.CachingConnectionFactory">
+        <property name="host" value="${amqp.host}"/>
+        <property name="virtualHost" value="${amqp.virtualHost}"/>
+        <property name="username" value="${amqp.username}"/>
+        <property name="password" value="${amqp.password}"/>
+    </bean>
+
+    <bean id="rabbitAdmin" class="org.springframework.amqp.rabbit.core.RabbitAdmin">
+        <constructor-arg ref="connectionFactory"/>
+    </bean>
+
+    <!--<bean id="amqpTemplate" class="org.springframework.amqp.rabbit.core.RabbitTemplate">-->
+    <!--<constructor-arg ref="connectionFactory"/>-->
+    <!--<property name="retryTemplate">-->
+    <!--<bean class="org.springframework.retry.support.RetryTemplate">-->
+    <!--<property name="backOffPolicy">-->
+    <!--<bean class="org.springframework.retry.backoff.ExponentialBackOffPolicy">-->
+    <!--<property name="initialInterval" value="500"/>-->
+    <!--<property name="maxInterval" value="10000"/>-->
+    <!--<property name="multiplier" value="10"/>-->
+    <!--</bean>-->
+    <!--</property>-->
+    <!--</bean>-->
+    <!--</property>-->
+    <!--</bean>-->
+
+    <bean id="resizeQueueConnector" class="my.dertraktor.mq.cloudmq.RabbitQueueConnector">
+        <property name="rabbitAdmin" ref="rabbitAdmin"/>
+        <property name="queueName" value="${queue.resize}"/>
+    </bean>
+
+    <bean id="uploadQueueConnector" class="my.dertraktor.mq.cloudmq.RabbitQueueConnector">
+        <property name="rabbitAdmin" ref="rabbitAdmin"/>
+        <property name="queueName" value="${queue.upload}"/>
+    </bean>
+
+    <bean id="doneQueueConnector" class="my.dertraktor.mq.cloudmq.RabbitQueueConnector">
+        <property name="rabbitAdmin" ref="rabbitAdmin"/>
+        <property name="queueName" value="${queue.done}"/>
+    </bean>
+
+    <bean id="failedQueueConnector" class="my.dertraktor.mq.cloudmq.RabbitQueueConnector">
+        <property name="rabbitAdmin" ref="rabbitAdmin"/>
+        <property name="queueName" value="${queue.failed}"/>
+    </bean>
+
+    <bean id="resizedImagesDirectory" class="java.lang.String">
+        <constructor-arg value="${imageresizer.resizedImagedDirectory}"/>
+    </bean>
+
+    <bean id="dropBoxUploader" class="my.dertraktor.cloudstorage.dropboxuploader.DropBoxUploader">
+        <property name="accessToken" value="${cloudstorage.dropBox.AccessToken}"/>
+        <property name="dropBoxFolder" value="${cloudstorage.dropBox.dropBoxFolder}"/>
+    </bean>
+
+</beans>
